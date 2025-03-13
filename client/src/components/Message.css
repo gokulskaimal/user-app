@@ -1,0 +1,73 @@
+/* General Toast Styling */
+.toast-content {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .toast-icon {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+  
+  .toast-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  
+  .toast-close:hover {
+    opacity: 1;
+  }
+  
+  /* Toast Types */
+  .toast-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .toast-error {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .toast-info {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .toast-warning {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .toast-default {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  /* Progress Bar */
+  .progress-success {
+    background-color: #218838;
+  }
+  
+  .progress-error {
+    background-color: #c82333;
+  }
+  
+  .progress-info {
+    background-color: #0069d9;
+  }
+  
+  .progress-warning {
+    background-color: #e0a800;
+  }
+  
+  .progress-default {
+    background-color: #5a6268;
+  }
+  
