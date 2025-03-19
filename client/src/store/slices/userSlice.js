@@ -104,6 +104,33 @@ export const searchUsers = createAsyncThunk("user/searchUsers", async (query, { 
   }
 })
 
+// Create user (admin)
+export const createUser = createAsyncThunk(
+  "user/createUser",
+  async (userData, { getState, rejectWithValue }) => {
+    try {
+      const { auth } = getState();
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.post(`${API_URL}/users`, userData, config);
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
 const initialState = {
   users: [],
   user: null,
@@ -192,6 +219,19 @@ const userSlice = createSlice({
         state.users = action.payload;
       })
       .addCase(searchUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Create user
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.users.push(action.payload);
+      })
+      .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

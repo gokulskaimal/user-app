@@ -6,12 +6,14 @@ import {
   deleteUser,
   uploadProfileImage,
   searchUsers,
+  createUser, // Add this import
 } from "../controllers/userController.js"
 import { protect, admin } from "../middleware/auth.js"
 
 const router = express.Router()
 
 // Admin routes
+router.post("/", protect, admin, createUser) // Add this new route
 router.get("/", protect, admin, getUsers)
 router.get("/search", protect, admin, searchUsers)
 router.get("/:id", protect, admin, getUserById)

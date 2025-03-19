@@ -9,6 +9,7 @@ import {
   searchUsers,
   clearError,
   resetSuccess,
+  createUser, // Add this import for the new feature
 } from "../../store/slices/userSlice";
 import Header from "../../components/Header";
 import { showToast,Notification } from "../../components/Message";
@@ -19,6 +20,15 @@ const AdminDashboardPage = () => {
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [searchError, setSearchError] = useState("");
+  // Add new state for add user modal
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "user"
+  });
+  const [addUserErrors, setAddUserErrors] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -46,10 +56,12 @@ const AdminDashboardPage = () => {
 
   useEffect(() => {
     if (success) {
-      showToast("User deleted successfully", "success");
+      showToast("Operation completed successfully", "success");
       setShowDeleteModal(false);
       setDeleteUserId(null);
-      dispatch(getUsers()); // Refresh user list after deletion
+      setShowAddModal(false); // Close add modal on success
+      setNewUser({ username: "", email: "", password: "", role: "user" }); // Reset form
+      dispatch(getUsers()); // Refresh user list
       dispatch(resetSuccess());
     }
   }, [success, dispatch]);
@@ -95,14 +107,54 @@ const AdminDashboardPage = () => {
     setShowDeleteModal(false);
   };
 
+  // Add new function to handle input changes for new user
+  const handleNewUserChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Add new function to validate new user form
+  const validateNewUser = () => {
+    const errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!newUser.username.trim()) errors.username = "Username is required";
+    if (!newUser.email.trim()) errors.email = "Email is required";
+    else if (!emailRegex.test(newUser.email)) errors.email = "Invalid email format";
+    if (!newUser.password) errors.password = "Password is required";
+    else if (newUser.password.length < 6) errors.password = "Password must be at least 6 characters";
+    
+    setAddUserErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Add new function to handle form submission
+  const handleAddUser = (e) => {
+    e.preventDefault();
+    if (validateNewUser()) {
+      dispatch(createUser(newUser));
+    }
+  };
+
   return (
     <>
       <Header />
       <Notification />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Admin Dashboard
-        </h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Admin Dashboard
+          </h1>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Add User
+          </button>
+        </div>
 
         {/* Search Form */}
         <div className="mb-6 flex justify-center">
@@ -278,6 +330,103 @@ const AdminDashboardPage = () => {
                   {loading ? "Deleting..." : "Delete"}
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md mx-auto w-full">
+              <h2 className="text-xl font-bold mb-4">Add New User</h2>
+              <form onSubmit={handleAddUser}>
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={newUser.username}
+                    onChange={handleNewUserChange}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      addUserErrors.username ? "border-red-500" : ""
+                    }`}
+                  />
+                  {addUserErrors.username && (
+                    <p className="text-red-500 text-xs italic mt-1">{addUserErrors.username}</p>
+                  )}
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={newUser.email}
+                    onChange={handleNewUserChange}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      addUserErrors.email ? "border-red-500" : ""
+                    }`}
+                  />
+                  {addUserErrors.email && (
+                    <p className="text-red-500 text-xs italic mt-1">{addUserErrors.email}</p>
+                  )}
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={newUser.password}
+                    onChange={handleNewUserChange}
+                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      addUserErrors.password ? "border-red-500" : ""
+                    }`}
+                  />
+                  {addUserErrors.password && (
+                    <p className="text-red-500 text-xs italic mt-1">{addUserErrors.password}</p>
+                  )}
+                </div>
+                <div className="mb-6">
+                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+                    Role
+                  </label>
+                  <select
+                    id="role"
+                    name="role"
+                    value={newUser.role}
+                    onChange={handleNewUserChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                      loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={loading}
+                  >
+                    {loading ? "Adding..." : "Add User"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

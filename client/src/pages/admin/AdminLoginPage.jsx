@@ -26,15 +26,9 @@ const AdminLoginPage = () => {
     if (!formData.password) {
       tempErrors.password = "Password is required";
       isValid = false;
-    } else if (formData.password.length < 8) {
-      tempErrors.password = "Password must be at least 8 characters long";
-      isValid = false;
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(formData.password)) {
-      tempErrors.password =
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
-      isValid = false;
     }
-
+    // Remove complex password validation for admin login
+    
     setErrors(tempErrors);
     if (!isValid) {
       const firstError = Object.values(tempErrors).find((err) => err);

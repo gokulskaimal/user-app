@@ -5,7 +5,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 
-// Load environment variables
+// Load environment variables 
 dotenv.config();
 
 const app = express();
@@ -16,9 +16,9 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" })); 
 app.use(cors());
 
-// ✅ Connect to MongoDB
+// ✅ Connect to MongoDB  
 mongoose
-  .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
